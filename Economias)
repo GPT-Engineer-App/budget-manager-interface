@@ -1,0 +1,69 @@
+<?php
+session_start();
+include('db.php');
+if (!isset($_SESSION['email'])) {
+    header('Location: index.php');
+    exit();
+}
+
+$query = "SELECT * FROM economia WHERE usuario_email='" . $_SESSION['email'] . "'";
+$result = mysqli_query($conn, $query);
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economias</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Economias</h1>
+        <canvas id="economiasChart"></canvas>
+        <table>
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                    <tr>
+                        <td><?php echo $row['descricao']; ?></td>
+                        <td><?php echo $row['valor']; ?></td>
+                        <td><?php echo $row['data']; ?></td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+        <button onclick="window.location.href='add_economia.php'">Adicionar Economia</button>
+    </div>
+    <script>
+        const ctx = document.getElementById('economiasChart').getContext('2d');
+        const economiasChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'],
+                datasets: [{
+                    label: 'Economias',
+                    data: [500, 600, 700, 800, 900, 1000],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
